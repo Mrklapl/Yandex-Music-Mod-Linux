@@ -7,7 +7,12 @@ set -e
 WORKDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 echo "==> Building Yandex Music Mod AppImage in: ${WORKDIR}"
 
-if [ ! -d "${WORKDIR}/inspect_asar" ]; then
+INSPECT_DIR="${WORKDIR}/inspect_asar"
+if [ ! -d "${INSPECT_DIR}" ] && [ -d "${WORKDIR}/../inspect_asar" ]; then
+    INSPECT_DIR="${WORKDIR}/../inspect_asar"
+fi
+
+if [ ! -d "${INSPECT_DIR}" ]; then
     echo "ERROR: inspect_asar directory not found!"
     exit 1
 fi
@@ -15,8 +20,8 @@ fi
 TMP_DIR="$(mktemp -d -t yandex_rebuild_XXXXXX)"
 trap "rm -rf ${TMP_DIR}" EXIT
 
-echo "==> Packaging ASAR archive..."
-bunx asar pack "${WORKDIR}/inspect_asar" "${TMP_DIR}/new_app.asar" --unpack "**/ffmpeg-static/**"
+echo "==> Packaging ASAR archive from ${INSPECT_DIR}..."
+bunx asar pack "${INSPECT_DIR}" "${TMP_DIR}/new_app.asar" --unpack "**/ffmpeg-static/**"
 
 # If a base AppImage exists, extract and replace resources
 BASE_APPIMAGE="${1:-/home/xox/Downloads/YandexMusicMod-5.97.3-2.23.2.linux.AppImage}"
@@ -40,6 +45,9 @@ cp -r "${TMP_DIR}/new_app.asar.unpacked" "${TMP_DIR}/squashfs-root/resources/app
 if [ -f "${TMP_DIR}/squashfs-root/resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" ]; then
     chmod +x "${TMP_DIR}/squashfs-root/resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg"
 fi
+
+echo "==> Patching AppRun for auto Wayland ozone support (fixes invisible cursor on Wayland/Hyprland)..."
+sed -i 's|exec "$BIN"|exec "$BIN" ${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}|g' "${TMP_DIR}/squashfs-root/AppRun"
 
 echo "==> Compressing Squashfs filesystem..."
 mksquashfs "${TMP_DIR}/squashfs-root" "${TMP_DIR}/app.squashfs" -comp gzip -b 131072 -no-fragments
