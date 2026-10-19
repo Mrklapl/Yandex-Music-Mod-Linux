@@ -164,6 +164,46 @@ def patch_modern_chunks(inspect_dir):
             modified = True
             print(f"Patched wheel fallback in modern chunk: {fname}")
 
+        # 3. Plus unlock: User.hasPlus -> true
+        target_has_plus = "get hasPlus(){return!!e.account.data.hasPlus}"
+        new_has_plus = "get hasPlus(){return!0}"
+        if target_has_plus in content:
+            content = content.replace(target_has_plus, new_has_plus)
+            modified = True
+            print(f"Patched User.hasPlus in modern chunk: {fname}")
+
+        # 4. Plus unlock: FreeAccess -> all false
+        target_free_access = 'FreeAccess").views(e=>{let t={get isFreeDesktopUser(){let{user:t}=(0,P.M)(e);return!t.hasPlus&&T.NN},get isFreeWebUser(){let{user:t}=(0,P.M)(e);return!t.hasPlus&&T.$3},get isFreeUser(){return t.isFreeDesktopUser||t.isFreeWebUser},get isFreePlaybackDisabled(){'
+        new_free_access = 'FreeAccess").views(e=>{let t={get isFreeDesktopUser(){return!1},get isFreeWebUser(){return!1},get isFreeUser(){return!1},get isFreePlaybackDisabled(){return!1;'
+        if target_free_access in content:
+            content = content.replace(target_free_access, new_free_access)
+            modified = True
+            print(f"Patched FreeAccess in modern chunk: {fname}")
+
+        # 5. Plus unlock: e.account.data hasPlus -> true
+        target_acct_plus = "hasPlus:e.hasPlus,publicId:e.publicId"
+        new_acct_plus = "hasPlus:!0,publicId:e.publicId"
+        if target_acct_plus in content:
+            content = content.replace(target_acct_plus, new_acct_plus)
+            modified = True
+            print(f"Patched e.account.data.hasPlus in modern chunk: {fname}")
+
+        # 6. Plus unlock: Bypass PREVIEW quality fallback in layout
+        target_preview = "if(!h.isAuthorized||f.isFreeDesktopUser||H||f.limitedFreePlayback)return tV.e.PREVIEW;"
+        new_preview = "if(!1)return tV.e.PREVIEW;"
+        if target_preview in content:
+            content = content.replace(target_preview, new_preview)
+            modified = True
+            print(f"Patched PREVIEW quality check in modern chunk: {fname}")
+
+        # 7. Plus unlock: Remove 29s customDuration
+        target_duration = "customDuration:(null==n?void 0:n.isAuthorized)&&!o.isFreeDesktopUser?void 0:29"
+        new_duration = "customDuration:void 0"
+        if target_duration in content:
+            content = content.replace(target_duration, new_duration)
+            modified = True
+            print(f"Patched customDuration in modern chunk: {fname}")
+
         if modified:
             with open(fpath, "w", encoding="utf-8") as f:
                 f.write(content)
