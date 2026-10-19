@@ -46,9 +46,48 @@ def patch_7511(inspect_dir):
     if target_p_style in content:
         content = content.replace(target_p_style, new_p_style)
         
+    # 5. Reset button logic fix: Only show 'Назад к привычному' when actually in a custom interest/modifier
+    target_reset_avail = 'f=(()=>{let e=(0,P.eGp)(),t=e?.state.currentContext.value;if(t?.data.type===K.K.Vibe){var a;let e=t.data.meta.session?.wave;if(1===e?.seeds.length&&e?.seeds[0]===P.M19||1===e?.seeds.length&&(null==e||null==(a=e.seeds[0])?void 0:a.includes(P.yxZ)))return!1}return!0})()'
+    new_reset_avail = 'f=(()=>{try{if(d?.isMyVibe)return!1;let mv=g({id:\"entity-names.my-vibe\"});if(b===mv)return!1;let e=(0,P.eGp)(),t=e?.state.currentContext.value;if(!t||t?.data?.type!==K.K.Vibe)return!1;let w=t?.data?.meta?.session?.wave;if(!w||!w.seeds||0===w.seeds.length)return!1;if(w.seeds.includes(P.M19)||w.seeds[0]===P.M19||w.seeds.some(e=>e&&e.includes(P.yxZ)))return!1;return!0}catch(e){return!1}})()'
+    if target_reset_avail in content:
+        content = content.replace(target_reset_avail, new_reset_avail, 1)
+
+    # 6. VibePlayerBar seeking/scrubbing gesture: click & drag to scrub with floating timecode badge
+    pos2 = content.find('let Ii=')
+    end2 = content.find('var Li=', pos2) if pos2 != -1 else -1
+    if pos2 != -1 and end2 != -1:
+        orig_Ii = content[pos2:end2]
+        if 'onCenterPointerDown' not in orig_Ii:
+            new_Ii = '''let Ii=(0,d.PA)(e=>{let{hoveredButtonClassName:t}=e,{sonataState:a,advert:i,fullscreenPlayer:r,settings:{isMobile:s}}=(0,n.Pjs)(),o=(0,n.eGp)(),{formatMessage:d}=(0,re.A)(),m=(0,n.zwV)(),p=(0,N.d0)(),{isLiked:_,handleLike:y,isDisliked:h,handleDislike:g}=Ra(),x=(0,n.NKK)(),b=a.entityMeta,f=b?.mainAlbum,C=!a.isPlaying&&a.isVibeContext,k=a.position??0,S=a.duration??0,P=!a.isPlaying&&!b,[scrub,setScrub]=(0,u.useState)(null),dragRef=(0,u.useRef)({isDown:!1,isDragging:!1}),justScrubbedRef=(0,u.useRef)(!1);let onCenterPointerDown=(0,xe.c)(e=>{if(0!==e.button||!S||S<=0)return;let target=e.currentTarget,rect=target.getBoundingClientRect(),progressEl=target.closest(\".\"+ji().progress)||target.parentElement,progRect=progressEl?progressEl.getBoundingClientRect():rect;dragRef.current={isDown:!0,isDragging:!1,startX:e.clientX,startY:e.clientY,targetRect:rect,progRect:progRect,pointerId:e.pointerId,targetEl:target,lastSec:S>0?(k/S)*S:0};try{target.setPointerCapture(e.pointerId)}catch(t){}});let onCenterPointerMove=(0,xe.c)(e=>{let drag=dragRef.current;if(!drag||!drag.isDown)return;let dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;if(!drag.isDragging){if(Math.hypot(dx,dy)<4)return;drag.isDragging=!0}let rect=drag.targetRect,progRect=drag.progRect,fraction=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width)),curSec=fraction*S,fmt=e=>{let t=Math.max(0,Math.round(e)),a=Math.floor(t/60),i=t%60;return\"\"+a+\":\"+(i<10?\"0\":\"\")+i},text=fmt(curSec)+\" / \"+fmt(S),rawX=e.clientX-progRect.left,minX=rect.left-progRect.left+36,maxX=rect.right-progRect.left-36,tooltipX=Math.max(minX,Math.min(maxX,rawX));drag.lastSec=curSec,drag.lastRatio=fraction,setScrub({ratio:fraction,sec:curSec,tooltipX:tooltipX,text:text})});let onCenterPointerUp=(0,xe.c)(e=>{let drag=dragRef.current;if(!drag||!drag.isDown)return;if(drag.isDragging){justScrubbedRef.current=!0,setTimeout(()=>{justScrubbedRef.current=!1},120);try{null==o||o.setProgress(drag.lastSec)}catch(t){}}try{drag.targetEl?.releasePointerCapture(drag.pointerId)}catch(t){}(dragRef.current={isDown:!1,isDragging:!1}),setScrub(null)});let onCenterPointerCancel=(0,xe.c)(e=>{let drag=dragRef.current;if(drag?.isDown)try{drag.targetEl?.releasePointerCapture(drag.pointerId)}catch(t){}(dragRef.current={isDown:!1,isDragging:!1}),setScrub(null)});let w=(0,xe.c)(()=>{if(a.entityMeta){if(r.modal.isOpened)return void r.modal.close();r.modal.open()}});(0,u.useEffect)(()=>{if(!a.isGenerativeContext)return null==m||m.addShortcutsListener(n.Mo.MAIN,n.lbr.TOGGLE_FULLSCREEN_PLAYER,w),null==m||m.addShortcutsListener(n.Mo.MAIN,n.lbr.LIKE,y),null==m||m.addShortcutsListener(n.Mo.MAIN,n.lbr.DISLIKE,g),()=>{null==m||m.removeShortcutsListener(n.Mo.MAIN,n.lbr.TOGGLE_FULLSCREEN_PLAYER),null==m||m.removeShortcutsListener(n.Mo.MAIN,n.lbr.LIKE),null==m||m.removeShortcutsListener(n.Mo.MAIN,n.lbr.DISLIKE)}},[g,y,m,a.isGenerativeContext,a.entityMeta,w]),(0,u.useEffect)(()=>{let e=b?.id,t=null!=b&&!1===b.hasSyncLyrics,a=null!=b&&!0===b.hasSyncLyrics,i=b?.trackSource,n=!!b?.isNonMusic,s=!0;try{!1===(\"undefined\"!=typeof window&&window.nativeSettings?window.nativeSettings.get(\"modSettings.lrclib.useText\"):null)&&(s=!1)}catch(e){}let l=e&&r.syncLyrics.currentTrackId!==e&&(t||a||!!b?.hasLyrics||\"UGC\"===i||!n&&s),c=J(o);G=o,l&&r.syncLyrics.getData(e),r.syncLyrics.prefetchTrack(c)},[b?.id,b?.hasSyncLyrics,b?.hasLyrics,b?.trackSource,b?.isNonMusic,r.syncLyrics,o]);let j=(0,Ne.L)(()=>{if(a.isGenerativeContext)return(0,l.jsx)(oe.Icon,{size:\"xs\",variant:\"infinity\"});let e=[];return C&&b&&(e.push((0,gi.XV)(b.artists)),e.push(\" — \")),b?.title&&e.push(b.title),!b?.isRemoved&&b?.version&&e.push(\"(\".concat(b.version,\")\")),e.join(\" \")}),I=(0,xe.c)(()=>{!b||a.isGenerativeContext||i.isAdvertShown||(r.showFullscreenPlayerModal(),x({to:ua.QT.PlayerScreen}))}),onCenterClick=(0,xe.c)(e=>{if(justScrubbedRef.current)return void(justScrubbedRef.current=!1);I()}),L=(0,xe.c)(e=>{(e.code===n.vLr.SPACE||e.code===n.vLr.ENTER)&&(e.preventDefault(),onCenterClick())}),T=(0,xe.c)(async e=>{await p(a,e)}),effectiveRatio=scrub?scrub.ratio:S>0?Math.min(k,S)/S:0,effectivePercent=100*effectiveRatio,E={\"--track-progress\":\"\".concat(effectivePercent,\"%\"),...(scrub?{\"--track-progress-transition\":\"none\"}:{})};return(0,l.jsxs)(\"section\",{role:\"region\",\"aria-label\":d({id:\"a11y-regions.player\"}),className:ji().root,style:E,children:[(0,l.jsx)(Ci,{album:f,hoveredButtonClassName:t}),(0,l.jsxs)(\"div\",{className:(0,c.$)(ji().progress,{[ji().progress_visible]:!P}),style:E,children:[!s&&(0,l.jsx)(Ya.r,{className:ji().changeVolume,buttonClassName:ji().button,verticalSliderClassName:ji().verticalSlider,variant:Ya.q.VERTICAL,sonataVolume:a.volume,onVolumeSet:a.setVolume,onVolumeClick:T}),(0,l.jsx)(v._I,{className:ji().button,disabled:!b||i.isAdvertShown,isDisliked:h,onClick:g,iconSize:\"xs\"}),(0,l.jsxs)(\"div\",{className:(0,c.$)(ji().center,{[ji().center_withExplicitMark]:b?.explicitDisclaimer,VibePlayerBar_scrubbing:!!scrub}),onClick:onCenterClick,onKeyDown:L,onPointerDown:onCenterPointerDown,onPointerMove:onCenterPointerMove,onPointerUp:onCenterPointerUp,onPointerCancel:onCenterPointerCancel,role:\"button\",tabIndex:0,\"aria-label\":d({id:\"player-actions.fullscreen-button\"}),style:scrub?{cursor:\"grabbing\",userSelect:\"none\"}:void 0,children:[(0,l.jsx)(vi,{className:ji().trackName,scrollingClassName:ji().scrollingTrackName,contentClassName:ji().trackNameText,pauseOnHover:!1,speed:35,gap:32,children:j},\"\".concat(a.entityMeta?.idWithContext??\"default\",\"-\").concat(C)),b?.explicitDisclaimer&&(0,l.jsx)(v.Nq,{containerClassName:ji().explicitMarkContainer,getDescriptionTexts:b.getDescriptionTexts,size:\"xxxs\",variant:b.explicitDisclaimer,className:ji().explicitMark,trackId:b.id})]}),(0,l.jsx)(v.cy,{className:ji().button,disabled:!b||i.isAdvertShown,isLiked:_,onClick:y,iconSize:\"xs\"}),!s&&(0,l.jsx)(Pi,{buttonClassName:(0,c.$)(ji().button,ji().important)}),(0,l.jsx)(Wa,{}),scrub&&(0,l.jsx)(\"div\",{style:{position:\"absolute\",bottom:\"calc(100% + 12px)\",left:\"\".concat(scrub.tooltipX,\"px\"),transform:\"translateX(-50%)\",backgroundColor:\"rgba(22, 22, 26, 0.88)\",backdropFilter:\"blur(16px)\",WebkitBackdropFilter:\"blur(16px)\",color:\"#ffffff\",padding:\"4px 12px\",borderRadius:\"9999px\",fontSize:\"12px\",fontWeight:\"600\",fontVariantNumeric:\"tabular-nums\",pointerEvents:\"none\",zIndex:9999,boxShadow:\"0 4px 20px rgba(0, 0, 0, 0.4)\",whiteSpace:\"nowrap\",letterSpacing:\"0.2px\",lineHeight:\"1.4\"},children:scrub.text})]})]})});'''
+            content = content[:pos2] + new_Ii + content[end2:]
+
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
     print("Successfully patched 7511!")
+
+def patch_css(inspect_dir):
+    path = os.path.join(inspect_dir, "app/_next/static/css/9efcd640c6a02026.css")
+    if not os.path.exists(path):
+        print(f"Warning: {path} not found")
+        return
+    with open(path, "r", encoding="utf-8") as f:
+        css = f.read()
+    rule = '''
+.VibePlayerBar_center__yug8i {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+.VibePlayerBar_center__yug8i.VibePlayerBar_scrubbing:before {
+    transition: none !important;
+}
+'''
+    if '.VibePlayerBar_scrubbing' not in css:
+        css += rule
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(css)
+        print("Successfully patched 9efcd640c6a02026.css!")
+    else:
+        print("CSS already patched!")
 
 def patch_6602(inspect_dir):
     path = os.path.join(inspect_dir, "app/_next/static/chunks/6602.3894c4c5abbbd85d.js")
@@ -109,4 +148,5 @@ if __name__ == "__main__":
     print(f"Applying wheel patch to: {inspect_dir}")
     patch_7511(inspect_dir)
     patch_6602(inspect_dir)
+    patch_css(inspect_dir)
     print("All patches applied successfully!")

@@ -47,7 +47,9 @@ if [ -f "${TMP_DIR}/squashfs-root/resources/app.asar.unpacked/node_modules/ffmpe
 fi
 
 echo "==> Patching AppRun for auto Wayland ozone support (fixes invisible cursor on Wayland/Hyprland)..."
-sed -i 's|exec "$BIN"|exec "$BIN" ${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}|g' "${TMP_DIR}/squashfs-root/AppRun"
+if ! grep -q "ozone-platform-hint" "${TMP_DIR}/squashfs-root/AppRun"; then
+    sed -i 's|exec "$BIN"|exec "$BIN" ${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}|g' "${TMP_DIR}/squashfs-root/AppRun"
+fi
 
 echo "==> Compressing Squashfs filesystem..."
 mksquashfs "${TMP_DIR}/squashfs-root" "${TMP_DIR}/app.squashfs" -comp gzip -b 131072 -no-fragments
