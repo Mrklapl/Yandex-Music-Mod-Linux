@@ -136,6 +136,38 @@ def patch_6602(inspect_dir):
         f.write(content)
     print("Successfully patched 6602!")
 
+def patch_modern_chunks(inspect_dir):
+    chunks_dir = os.path.join(inspect_dir, "app/_next/static/chunks")
+    if not os.path.isdir(chunks_dir):
+        return
+    for fname in os.listdir(chunks_dir):
+        if not fname.endswith(".js"):
+            continue
+        fpath = os.path.join(chunks_dir, fname)
+        with open(fpath, "r", encoding="utf-8") as f:
+            content = f.read()
+        modified = False
+
+        # 1. Reset button logic fix for modern build:
+        target_reset = "$=(()=>{let e=(0,ts.e)(),t=null==e?void 0:e.state.currentContext.value;if((null==t?void 0:t.data.type)===iP.K.Vibe){var i,a;let e=null==(i=t.data.meta.session)?void 0:i.wave;if((null==e?void 0:e.seeds.length)===1&&(null==e?void 0:e.seeds[0])===eu.M1||(null==e?void 0:e.seeds.length)===1&&(null==e||null==(a=e.seeds[0])?void 0:a.includes(eu.yx)))return!1}return!0})()"
+        new_reset = "$=(()=>{try{let e=(0,ts.e)(),t=e?.state.currentContext.value;if(!t||t?.data?.type!==iP.K.Vibe)return!1;let w=t?.data?.meta?.session?.wave;if(!w||!w.seeds||0===w.seeds.length)return!1;if(w.seeds.includes(eu.M1)||w.seeds[0]===eu.M1||w.seeds.some(e=>e&&e.includes(eu.yx)))return!1;return!0}catch(e){return!1}})()"
+        if target_reset in content:
+            content = content.replace(target_reset, new_reset)
+            modified = True
+            print(f"Patched reset button logic in modern chunk: {fname}")
+
+        # 2. Wheel fallback render in modern build:
+        target_render = "return l&&r?(0,i.jsx)(eS,{className:t}):(0,i.jsx)(L.RC,"
+        new_render = "return(l||r||0===a.length)?(0,i.jsx)(eS,{className:t}):(0,i.jsx)(L.RC,"
+        if target_render in content:
+            content = content.replace(target_render, new_render)
+            modified = True
+            print(f"Patched wheel fallback in modern chunk: {fname}")
+
+        if modified:
+            with open(fpath, "w", encoding="utf-8") as f:
+                f.write(content)
+
 if __name__ == "__main__":
     inspect_dir = sys.argv[1] if len(sys.argv) > 1 else "inspect_asar"
     if not os.path.isdir(inspect_dir):
@@ -146,7 +178,10 @@ if __name__ == "__main__":
             print(f"ERROR: {inspect_dir} not found!")
             sys.exit(1)
     print(f"Applying wheel patch to: {inspect_dir}")
-    patch_7511(inspect_dir)
-    patch_6602(inspect_dir)
+    if os.path.exists(os.path.join(inspect_dir, "app/_next/static/chunks/7511-470ddb0b1430b7fa.js")):
+        patch_7511(inspect_dir)
+    if os.path.exists(os.path.join(inspect_dir, "app/_next/static/chunks/6602.3894c4c5abbbd85d.js")):
+        patch_6602(inspect_dir)
+    patch_modern_chunks(inspect_dir)
     patch_css(inspect_dir)
     print("All patches applied successfully!")

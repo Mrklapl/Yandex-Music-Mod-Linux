@@ -1,16 +1,17 @@
 # 🎵 Яндекс Музыка Мод для Linux (AppImage)
 
-[![Release](https://img.shields.io/badge/Версия-5.97.3--2.23.2-blue.svg)](https://github.com/Mrklapl/Yandex-Music-Mod-Linux/releases)
+[![Release](https://img.shields.io/badge/Версия-5.123.4--2.23.2-blue.svg)](https://github.com/Mrklapl/Yandex-Music-Mod-Linux/releases)
 [![Platform](https://img.shields.io/badge/Платформа-Linux%20(AppImage)-orange.svg)](https://appimage.org/)
 [![Status](https://img.shields.io/badge/Статус-Стабильный-success.svg)]()
 [![Privacy](https://img.shields.io/badge/Аккаунты-100%25%20Clean-brightgreen.svg)]()
 
-Полноценная сборка популярного мода **Яндекс Музыки** в формате **AppImage** для Linux с эксклюзивными улучшениями интерфейса, мобильным жестом перемотки трека, стабильной навигацией и полной поддержкой «Кольца интересов» в «Моей волне».
+Полноценная сборка популярного мода **Яндекс Музыки** в формате **AppImage** для Linux на базе актуального официального релиза **5.123.4** (Electron 38.2.2 / Chromium 140) с эксклюзивными улучшениями интерфейса, мобильным жестом перемотки трека, стабильной навигацией и полной поддержкой «Кольца интересов» в «Моей волне».
 
 ---
 
 ## ✨ Возможности и преимущества
 
+- ⚡ **Новейшая официальная база 5.123.4**: современное ядро Electron 38 / Chromium 140, повышенная производительность, плавность анимаций и актуальные протоколы синхронизации Яндекс Музыки.
 - 🔓 **Работа без подписки «Плюс»**: обход ограничений бесплатного тарифа.
 - 🎧 **Максимальное качество звука**: прослушивание в High Quality и Lossless/FLAC.
 - 👆 **Перемотка трека зажатием названия (как в мобильном приложении)**:
@@ -48,14 +49,14 @@
 ## 🚀 Установка и запуск
 
 ### Вариант 1: Запуск готового AppImage
-1. Скачайте файл `YandexMusicMod-5.97.3-2.23.2.linux.AppImage` из раздела [Releases](releases).
+1. Скачайте файл `YandexMusicMod-5.123.4-2.23.2.linux.AppImage` из раздела [Releases](releases).
 2. Сделайте файл исполняемым:
    ```bash
-   chmod +x YandexMusicMod-5.97.3-2.23.2.linux.AppImage
+   chmod +x YandexMusicMod-5.123.4-2.23.2.linux.AppImage
    ```
 3. Запустите двойным кликом или через терминал:
    ```bash
-   ./YandexMusicMod-5.97.3-2.23.2.linux.AppImage
+   ./YandexMusicMod-5.123.4-2.23.2.linux.AppImage
    ```
 
 ### Вариант 2: Добавление ярлыка в меню приложений
@@ -64,7 +65,7 @@
 [Desktop Entry]
 Name=Яндекс Музыка
 Comment=Слушайте треки, подкасты и Мою волну без ограничений
-Exec=/home/user/Downloads/YandexMusicMod-5.97.3-2.23.2.linux.AppImage %U
+Exec=/home/user/Downloads/YandexMusicMod-5.123.4-2.23.2.linux.AppImage %U
 Icon=/home/user/.local/share/icons/yandex-music.png
 Terminal=false
 Type=Application
