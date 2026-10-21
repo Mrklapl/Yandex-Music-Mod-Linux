@@ -1,145 +1,96 @@
-import os, sys
+#!/usr/bin/env python3
+import os, sys, glob, re
 
-def patch_7511(inspect_dir):
-    path = os.path.join(inspect_dir, "app/_next/static/chunks/7511-470ddb0b1430b7fa.js")
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-    
-    # 1. Locate getData in module 35796
-    target_start = "getData:(0,r.L3)(function*(n,l){let{context:d}=n"
-    if target_start not in content:
-        print("ERROR: target_start not found in 7511!")
-        sys.exit(1)
-        
-    start_pos = content.find(target_start)
-    end_marker = "}),S=n.default.default"
-    end_pos = content.find(end_marker, start_pos)
-    if end_pos == -1:
-        print("ERROR: end_marker not found in 7511!")
-        sys.exit(1)
-        
-    # Clean getData block without forcing genre:all, perfectly balanced syntax
-    new_block = """getData:(0,r.L3)(function*(n,l){let{context:d}=n;let u=(e=>{switch(e.type){case s.b.ALBUM:case s.b.ARTIST:return"".concat(e.type,":").concat(e.data.id);case s.b.PLAYLIST:return"".concat(e.type,":").concat(e.data.playlistUuid);case s.b.WAVE:return"".concat(e.type,":").concat(e.data.seeds.join(","));case s.b.GENERATIVE:case s.b.CLIP:return e.type;case s.b.OTHER:return"".concat(e.type,":").concat(e.data?.id??"")}})(d);if(u===e.lastRequestId&&e.items.length>0)return;let{wheelResource:m,modelActionsLogger:_}=(0,r._$)(e);e.loadingState=o.GuX.PENDING;let y=(()=>{if(0===i)return[];let e=Array(i),n=(a-i+100)%100;for(let a=0;a<i;a++){let i=t[(n+a)%100];i&&(e[a]=i)}return e})();let fbFn=e=>{let t=(e||(x=>x.id))({id:"vibe-wheel.activity-description"}),a=(e||(x=>x.id))({id:"vibe-wheel.mood-description"});return{wheelId:"PUMPKIN",items:[{id:"activity:wake-up",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.activity-wake-up"}),description:t,seeds:["activity:wake-up"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/JVsyUlrs9Y",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/28592/rotor-activity-wake-up-agent-cover-RSUMc/%%",color:"#FFFFD6"}}}},{id:"activity:road-trip",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.activity-road-trip"}),description:t,seeds:["activity:road-trip"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/Foah9sRLsS",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/70683/rotor-activity-road-trip-agent-cover-S1vPp/%%",color:"#FFFFDF"}}}},{id:"activity:work-background",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.activity-work-background"}),description:t,seeds:["activity:work-background"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/tsXpFHIBjM",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/2413828/rotor-activity-work-background-agent-cover-5t6qb/%%",color:"#FFFFFF"}}}},{id:"activity:workout",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.activity-workout"}),description:t,seeds:["activity:workout"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/PexWCCcEc9",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/2413828/rotor-activity-workout-agent-cover-Wcrjo/%%",color:"#EBFFFE"}}}},{id:"activity:fall-asleep",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.activity-fall-asleep"}),description:t,seeds:["activity:fall-asleep"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/J9QAoYnnPe",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/28592/rotor-activity-fall-asleep-agent-cover-XaOnj/%%",color:"#FAFFFF"}}}},{id:"mood:energetic",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.mood-energetic"}),description:a,seeds:["mood:energetic"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/e6Ptlara08",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/70683/rotor-mood-energetic-agent-cover-NrJtV/%%",color:"#FDFAFF"}}}},{id:"mood:happy",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.mood-happy"}),description:a,seeds:["mood:happy"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/EzOBeQmIXi",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/70683/rotor-mood-happy-agent-cover-JWFjr/%%",color:"#FFFFE8"}}}},{id:"mood:sad",type:c.D.WAVE,data:{wave:{name:(e||(x=>x.id))({id:"vibe-wheel.mood-sad"}),description:a,seeds:["mood:sad"]},agent:{animationUri:"https://music-custom-wave-media.music.yandex.net/rrF2I4tUvZ",cover:{uri:"https://avatars.mds.yandex.net/get-music-misc/30221/rotor-mood-sad-agent-cover-IN0O6/%%",color:"#EAFFFF"}}}}]};};try{let t=yield m.wheelNew({context:d,feedbacks:y});let parsed=p(t);if(parsed&&parsed.length>0){i=0,e.wheelId=t.wheelId,e.items=(0,r.wg)(parsed),e.activeIndex=1,e.lastRequestId=u,e.loadingState=o.GuX.RESOLVE}else if(e.items.length===0){let fb=fbFn(l);e.wheelId=fb.wheelId,e.items=(0,r.wg)(p(fb)),e.activeIndex=1,e.lastRequestId=u,e.loadingState=o.GuX.RESOLVE}else{e.loadingState=o.GuX.RESOLVE}}catch(t){if(_.error(t),e.isEmpty){let fb=fbFn(l);e.wheelId=fb.wheelId,e.items=(0,r.wg)(p(fb)),e.activeIndex=1}e.loadingState=o.GuX.RESOLVE}})}"""
-    
-    content = content[:start_pos] + new_block + content[end_pos:]
-    
-    # 2. Fix null-safe addFeedback calls to prevent Uncaught TypeError in detached items
-    target_fb_view = "handleFeedbackView(){let{wheel:t}=(0,r.Zn)(e);t.addFeedback(i.VIEW,e.type,e.id,e.index)}"
-    safe_fb_view = "handleFeedbackView(){let t=(0,r.Zn)(e);(t?.wheel||t)?.addFeedback?.(i.VIEW,e.type,e.id,e.index)}"
-    if target_fb_view in content:
-        content = content.replace(target_fb_view, safe_fb_view)
-        
-    target_fb_click = "handleFeedbackClick(){let{wheel:t}=(0,r.Zn)(e);t.addFeedback(i.CLICK,e.type,e.id,e.index)}"
-    safe_fb_click = "handleFeedbackClick(){let t=(0,r.Zn)(e);(t?.wheel||t)?.addFeedback?.(i.CLICK,e.type,e.id,e.index)}"
-    if target_fb_click in content:
-        content = content.replace(target_fb_click, safe_fb_click)
-        
-    # 3. Add PROMO support to enum module 58412 (used by BaseWheelItem style validation)
-    target_enum = 'e.DEFAULT="DEFAULT",e.CONTROL="CONTROL",e.CONTROL_ACCENT="CONTROL_ACCENT"'
-    new_enum = 'e.DEFAULT="DEFAULT",e.CONTROL="CONTROL",e.CONTROL_ACCENT="CONTROL_ACCENT",e.PROMO="PROMO"'
-    if target_enum in content:
-        content = content.replace(target_enum, new_enum)
-        
-    # 4. Normalize style fallback in module 35796 p function
-    target_p_style = "style:e.style??d.y.DEFAULT"
-    new_p_style = "style:(e.style&&Object.values(d.y).includes(e.style))?e.style:d.y.DEFAULT"
-    if target_p_style in content:
-        content = content.replace(target_p_style, new_p_style)
-        
-    # 5. Reset button logic fix: Only show 'Назад к привычному' when actually in a custom interest/modifier
-    target_reset_avail = 'f=(()=>{let e=(0,P.eGp)(),t=e?.state.currentContext.value;if(t?.data.type===K.K.Vibe){var a;let e=t.data.meta.session?.wave;if(1===e?.seeds.length&&e?.seeds[0]===P.M19||1===e?.seeds.length&&(null==e||null==(a=e.seeds[0])?void 0:a.includes(P.yxZ)))return!1}return!0})()'
-    new_reset_avail = 'f=(()=>{try{if(d?.isMyVibe)return!1;let mv=g({id:\"entity-names.my-vibe\"});if(b===mv)return!1;let e=(0,P.eGp)(),t=e?.state.currentContext.value;if(!t||t?.data?.type!==K.K.Vibe)return!1;let w=t?.data?.meta?.session?.wave;if(!w||!w.seeds||0===w.seeds.length)return!1;if(w.seeds.includes(P.M19)||w.seeds[0]===P.M19||w.seeds.some(e=>e&&e.includes(P.yxZ)))return!1;return!0}catch(e){return!1}})()'
-    if target_reset_avail in content:
-        content = content.replace(target_reset_avail, new_reset_avail, 1)
+def patch_vibe_playerbar(inspect_dir):
+    chunks_dir = os.path.join(inspect_dir, "app/_next/static/chunks")
+    for fpath in glob.glob(os.path.join(chunks_dir, "*.js")):
+        with open(fpath, "r", encoding="utf-8") as f:
+            content = f.read()
 
-    # 6. VibePlayerBar seeking/scrubbing gesture: click & drag to scrub with floating timecode badge
-    pos2 = content.find('let Ii=')
-    end2 = content.find('var Li=', pos2) if pos2 != -1 else -1
-    if pos2 != -1 and end2 != -1:
-        orig_Ii = content[pos2:end2]
-        if 'onCenterPointerDown' not in orig_Ii:
-            new_Ii = '''let Ii=(0,d.PA)(e=>{let{hoveredButtonClassName:t}=e,{sonataState:a,advert:i,fullscreenPlayer:r,settings:{isMobile:s}}=(0,n.Pjs)(),o=(0,n.eGp)(),{formatMessage:d}=(0,re.A)(),m=(0,n.zwV)(),p=(0,N.d0)(),{isLiked:_,handleLike:y,isDisliked:h,handleDislike:g}=Ra(),x=(0,n.NKK)(),b=a.entityMeta,f=b?.mainAlbum,C=!a.isPlaying&&a.isVibeContext,k=a.position??0,S=a.duration??0,P=!a.isPlaying&&!b,[scrub,setScrub]=(0,u.useState)(null),dragRef=(0,u.useRef)({isDown:!1,isDragging:!1}),justScrubbedRef=(0,u.useRef)(!1);let onCenterPointerDown=(0,xe.c)(e=>{if(0!==e.button||!S||S<=0)return;let target=e.currentTarget,rect=target.getBoundingClientRect(),progressEl=target.closest(\".\"+ji().progress)||target.parentElement,progRect=progressEl?progressEl.getBoundingClientRect():rect;dragRef.current={isDown:!0,isDragging:!1,startX:e.clientX,startY:e.clientY,targetRect:rect,progRect:progRect,pointerId:e.pointerId,targetEl:target,lastSec:S>0?(k/S)*S:0};try{target.setPointerCapture(e.pointerId)}catch(t){}});let onCenterPointerMove=(0,xe.c)(e=>{let drag=dragRef.current;if(!drag||!drag.isDown)return;let dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;if(!drag.isDragging){if(Math.hypot(dx,dy)<4)return;drag.isDragging=!0}let rect=drag.targetRect,progRect=drag.progRect,fraction=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width)),curSec=fraction*S,fmt=e=>{let t=Math.max(0,Math.round(e)),a=Math.floor(t/60),i=t%60;return\"\"+a+\":\"+(i<10?\"0\":\"\")+i},text=fmt(curSec)+\" / \"+fmt(S),rawX=e.clientX-progRect.left,minX=rect.left-progRect.left+36,maxX=rect.right-progRect.left-36,tooltipX=Math.max(minX,Math.min(maxX,rawX));drag.lastSec=curSec,drag.lastRatio=fraction,setScrub({ratio:fraction,sec:curSec,tooltipX:tooltipX,text:text})});let onCenterPointerUp=(0,xe.c)(e=>{let drag=dragRef.current;if(!drag||!drag.isDown)return;if(drag.isDragging){justScrubbedRef.current=!0,setTimeout(()=>{justScrubbedRef.current=!1},120);try{null==o||o.setProgress(drag.lastSec)}catch(t){}}try{drag.targetEl?.releasePointerCapture(drag.pointerId)}catch(t){}(dragRef.current={isDown:!1,isDragging:!1}),setScrub(null)});let onCenterPointerCancel=(0,xe.c)(e=>{let drag=dragRef.current;if(drag?.isDown)try{drag.targetEl?.releasePointerCapture(drag.pointerId)}catch(t){}(dragRef.current={isDown:!1,isDragging:!1}),setScrub(null)});let w=(0,xe.c)(()=>{if(a.entityMeta){if(r.modal.isOpened)return void r.modal.close();r.modal.open()}});(0,u.useEffect)(()=>{if(!a.isGenerativeContext)return null==m||m.addShortcutsListener(n.Mo.MAIN,n.lbr.TOGGLE_FULLSCREEN_PLAYER,w),null==m||m.addShortcutsListener(n.Mo.MAIN,n.lbr.LIKE,y),null==m||m.addShortcutsListener(n.Mo.MAIN,n.lbr.DISLIKE,g),()=>{null==m||m.removeShortcutsListener(n.Mo.MAIN,n.lbr.TOGGLE_FULLSCREEN_PLAYER),null==m||m.removeShortcutsListener(n.Mo.MAIN,n.lbr.LIKE),null==m||m.removeShortcutsListener(n.Mo.MAIN,n.lbr.DISLIKE)}},[g,y,m,a.isGenerativeContext,a.entityMeta,w]),(0,u.useEffect)(()=>{let e=b?.id,t=null!=b&&!1===b.hasSyncLyrics,a=null!=b&&!0===b.hasSyncLyrics,i=b?.trackSource,n=!!b?.isNonMusic,s=!0;try{!1===(\"undefined\"!=typeof window&&window.nativeSettings?window.nativeSettings.get(\"modSettings.lrclib.useText\"):null)&&(s=!1)}catch(e){}let l=e&&r.syncLyrics.currentTrackId!==e&&(t||a||!!b?.hasLyrics||\"UGC\"===i||!n&&s),c=J(o);G=o,l&&r.syncLyrics.getData(e),r.syncLyrics.prefetchTrack(c)},[b?.id,b?.hasSyncLyrics,b?.hasLyrics,b?.trackSource,b?.isNonMusic,r.syncLyrics,o]);let j=(0,Ne.L)(()=>{if(a.isGenerativeContext)return(0,l.jsx)(oe.Icon,{size:\"xs\",variant:\"infinity\"});let e=[];return C&&b&&(e.push((0,gi.XV)(b.artists)),e.push(\" — \")),b?.title&&e.push(b.title),!b?.isRemoved&&b?.version&&e.push(\"(\".concat(b.version,\")\")),e.join(\" \")}),I=(0,xe.c)(()=>{!b||a.isGenerativeContext||i.isAdvertShown||(r.showFullscreenPlayerModal(),x({to:ua.QT.PlayerScreen}))}),onCenterClick=(0,xe.c)(e=>{if(justScrubbedRef.current)return void(justScrubbedRef.current=!1);I()}),L=(0,xe.c)(e=>{(e.code===n.vLr.SPACE||e.code===n.vLr.ENTER)&&(e.preventDefault(),onCenterClick())}),T=(0,xe.c)(async e=>{await p(a,e)}),effectiveRatio=scrub?scrub.ratio:S>0?Math.min(k,S)/S:0,effectivePercent=100*effectiveRatio,E={\"--track-progress\":\"\".concat(effectivePercent,\"%\"),...(scrub?{\"--track-progress-transition\":\"none\"}:{})};return(0,l.jsxs)(\"section\",{role:\"region\",\"aria-label\":d({id:\"a11y-regions.player\"}),className:ji().root,style:E,children:[(0,l.jsx)(Ci,{album:f,hoveredButtonClassName:t}),(0,l.jsxs)(\"div\",{className:(0,c.$)(ji().progress,{[ji().progress_visible]:!P}),style:E,children:[!s&&(0,l.jsx)(Ya.r,{className:ji().changeVolume,buttonClassName:ji().button,verticalSliderClassName:ji().verticalSlider,variant:Ya.q.VERTICAL,sonataVolume:a.volume,onVolumeSet:a.setVolume,onVolumeClick:T}),(0,l.jsx)(v._I,{className:ji().button,disabled:!b||i.isAdvertShown,isDisliked:h,onClick:g,iconSize:\"xs\"}),(0,l.jsxs)(\"div\",{className:(0,c.$)(ji().center,{[ji().center_withExplicitMark]:b?.explicitDisclaimer,VibePlayerBar_scrubbing:!!scrub}),onClick:onCenterClick,onKeyDown:L,onPointerDown:onCenterPointerDown,onPointerMove:onCenterPointerMove,onPointerUp:onCenterPointerUp,onPointerCancel:onCenterPointerCancel,role:\"button\",tabIndex:0,\"aria-label\":d({id:\"player-actions.fullscreen-button\"}),style:scrub?{cursor:\"grabbing\",userSelect:\"none\"}:void 0,children:[(0,l.jsx)(vi,{className:ji().trackName,scrollingClassName:ji().scrollingTrackName,contentClassName:ji().trackNameText,pauseOnHover:!1,speed:35,gap:32,children:j},\"\".concat(a.entityMeta?.idWithContext??\"default\",\"-\").concat(C)),b?.explicitDisclaimer&&(0,l.jsx)(v.Nq,{containerClassName:ji().explicitMarkContainer,getDescriptionTexts:b.getDescriptionTexts,size:\"xxxs\",variant:b.explicitDisclaimer,className:ji().explicitMark,trackId:b.id})]}),(0,l.jsx)(v.cy,{className:ji().button,disabled:!b||i.isAdvertShown,isLiked:_,onClick:y,iconSize:\"xs\"}),!s&&(0,l.jsx)(Pi,{buttonClassName:(0,c.$)(ji().button,ji().important)}),(0,l.jsx)(Wa,{}),scrub&&(0,l.jsx)(\"div\",{style:{position:\"absolute\",bottom:\"calc(100% + 12px)\",left:\"\".concat(scrub.tooltipX,\"px\"),transform:\"translateX(-50%)\",backgroundColor:\"rgba(22, 22, 26, 0.88)\",backdropFilter:\"blur(16px)\",WebkitBackdropFilter:\"blur(16px)\",color:\"#ffffff\",padding:\"4px 12px\",borderRadius:\"9999px\",fontSize:\"12px\",fontWeight:\"600\",fontVariantNumeric:\"tabular-nums\",pointerEvents:\"none\",zIndex:9999,boxShadow:\"0 4px 20px rgba(0, 0, 0, 0.4)\",whiteSpace:\"nowrap\",letterSpacing:\"0.2px\",lineHeight:\"1.4\"},children:scrub.text})]})]})});'''
-            content = content[:pos2] + new_Ii + content[end2:]
+        # Check for 5.123.4 VibePlayerbar in 2850
+        start_marker = 'let t9=(0,u.PA)(()=>{var e,t,i,a,n;let{experiments:r,sonataState:s,advert:o,settings:{isMobile:l}}=(0,U.g)()'
+        end_marker = ';var t4=i(56530)'
+        s_pos = content.find(start_marker)
+        e_pos = content.find(end_marker, s_pos) if s_pos != -1 else -1
 
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-    print("Successfully patched 7511!")
+        if s_pos != -1 and e_pos != -1:
+            print(f"Found modern VibePlayerBar in {os.path.basename(fpath)}")
+            new_t9 = '''let t9=(0,u.PA)(()=>{var e,t,i,a,n;let{experiments:r,sonataState:s,advert:o,settings:{isMobile:l},fullscreenPlayer:fsp}=(0,U.g)(),{formatMessage:u}=(0,v.A)(),_=(0,ts.e)(),nav=(0,tm.N)(),b=s.entityMeta,p=!s.isPlaying&&s.isVibeContext,h=null!=(i=s.position)?i:0,x=null!=(a=s.duration)?a:0,[A,C]=(0,m.useState)(null),j=(0,m.useRef)(!1),{state:N,toggleTrue:P,toggleFalse:T}=(0,eo.e)(!1),k=!!x&&!s.isGenerativeContext&&N,S=j.current&&null!=A?A:h,w=x>0?Math.min(S,x)/x*100:0,I=(0,t1.E)(Math.round(S),Math.round(x)),E=(0,t1.E)(Math.round(x),Math.round(x)),O=(0,t2.P)(S),B=(0,t2.P)(x),[scrub,setScrub]=(0,m.useState)(null),dragRef=(0,m.useRef)({isDown:!1,isDragging:!1}),justScrubbedRef=(0,m.useRef)(!1);let onCenterPointerDown=(0,f.c)(e=>{if(0!==e.button||!x||x<=0)return;let target=e.currentTarget,rect=target.getBoundingClientRect();dragRef.current={isDown:!0,isDragging:!1,startX:e.clientX,startY:e.clientY,targetRect:rect,pointerId:e.pointerId,targetEl:target,lastSec:x>0?(h/x)*x:0};try{target.setPointerCapture(e.pointerId)}catch(t){}});let onCenterPointerMove=(0,f.c)(e=>{let drag=dragRef.current;if(!drag||!drag.isDown)return;let dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;if(!drag.isDragging){if(Math.hypot(dx,dy)<4)return;drag.isDragging=!0}let rect=drag.targetRect,fraction=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width)),curSec=fraction*x,fmt=e=>{let t=Math.max(0,Math.round(e)),a=Math.floor(t/60),i=t%60;return\"\"+a+\":\"+(i<10?\"0\":\"\")+i},text=fmt(curSec)+\" / \"+fmt(x),rawX=e.clientX-rect.left,minX=36,maxX=rect.width-36,tooltipX=Math.max(minX,Math.min(maxX,rawX));drag.lastSec=curSec,drag.lastRatio=fraction,setScrub({ratio:fraction,sec:curSec,tooltipX:tooltipX,text:text})});let onCenterPointerUp=(0,f.c)(e=>{let drag=dragRef.current;if(!drag||!drag.isDown)return;if(drag.isDragging){justScrubbedRef.current=!0;setTimeout(()=>{justScrubbedRef.current=!1},120);try{null==_||_.setProgress(drag.lastSec)}catch(t){}}try{drag.targetEl?.releasePointerCapture(drag.pointerId)}catch(t){}dragRef.current={isDown:!1,isDragging:!1};setScrub(null)});let onCenterPointerCancel=(0,f.c)(e=>{let drag=dragRef.current;if(drag?.isDown)try{drag.targetEl?.releasePointerCapture(drag.pointerId)}catch(t){}dragRef.current={isDown:!1,isDragging:!1};setScrub(null)});let onCenterClick=(0,f.c)(e=>{if(justScrubbedRef.current)return void(justScrubbedRef.current=!1);if(!b||s.isGenerativeContext||o.isAdvertShown)return;try{null==fsp||fsp.showFullscreenPlayerModal(),null==nav||nav({to:e8.AppScreen.PlayerScreen})}catch(t){}});let effRatio=scrub?scrub.ratio:x>0?Math.min(S,x)/x:0,effPercent=100*effRatio,M={\"--track-progress\":\"\".concat(effPercent,\"%\"),\"--progress-transition-duration\":(e=>{if(\"default\"!==e&&void 0!==e)return\"on1\"===e?\"150ms\":\"0ms\"})(null==(e=r.getExperiment(z.z.WebNextMainPlayerAnimation))?void 0:e.group),\"--progress-transition\":(j.current||scrub)?\"none\":void 0};let R=(0,m.useMemo)(()=>(0,tY.A)(()=>{T()},1e3),[T]),L=(0,f.c)((e,t)=>{o.isAdvertShown||(j.current=!t,l&&(P(),R.cancel(),R()),t?null==_||_.setProgress(e):C(e))}),W=(0,y.L)(()=>{if(s.isGenerativeContext)return(null==b?void 0:b.title)?(0,d.jsxs)(d.Fragment,{children:[(0,d.jsx)(\"span\",{className:t6().generativeIcon,children:(0,d.jsx)(Y.I,{size:\"xs\",variant:\"infinity\",\"data-test-id\":g.e8.player.VIBE_PLAYERBAR_NEUROMUSIC_ICON})}),(0,d.jsx)(\"span\",{className:t6().generativeTitle,children:b.title})]}):(0,d.jsx)(Y.I,{size:\"xs\",variant:\"infinity\",\"data-test-id\":g.e8.player.VIBE_PLAYERBAR_NEUROMUSIC_ICON});let e=[],t=[];return b&&(e.push((0,t0.X)(b.artists)),e.push(\"—\")),(null==b?void 0:b.title)&&t.push(b.title),!(null==b?void 0:b.isRemoved)&&(null==b?void 0:b.version)&&t.push(\"(\".concat(b.version,\")\")),(0,d.jsxs)(d.Fragment,{children:[e.length>0&&p&&(0,d.jsx)(\"span\",{className:t6().artists,children:e.join(\" \")}),t.join(\" \")]})});return(0,d.jsx)(\"div\",{className:t6().root,style:M,children:(0,d.jsxs)(\"div\",{className:(0,c.$)(t6().center,{[t6().center_withExplicitMark]:null==b?void 0:b.explicitDisclaimer,[t6().center_withExplicitMark_playing]:s.isPlaying,[t6().center_withoutExplicitMark]:!(null==b?void 0:b.explicitDisclaimer),[t6().center_withoutExplicitMark_playing]:s.isPlaying,[t6().center_withTimecode]:k||!!scrub,[t6().center_active]:!s.isGenerativeContext,VibePlayerbarMeta_scrubbing:!!scrub}),onMouseEnter:P,onMouseLeave:T,onClick:onCenterClick,onPointerDown:onCenterPointerDown,onPointerMove:onCenterPointerMove,onPointerUp:onCenterPointerUp,onPointerCancel:onCenterPointerCancel,style:scrub?{cursor:\"grabbing\",userSelect:\"none\"}:void 0,\"data-test-id\":g.e8.player.VIBE_PLAYERBAR_TIMECODE_SLIDER,children:[(0,d.jsx)(tQ,{className:t6().trackName,scrollingClassName:t6().scrollingTrackName,contentClassName:t6().trackNameText,pauseOnHover:!1,speed:35,gap:32,\"data-test-id\":g.e8.player.VIBE_PLAYERBAR_TRACK_NAME,children:W},\"\".concat(null!=(n=null==(t=s.entityMeta)?void 0:t.idWithContext)?n:\"default\",\"-\").concat(p)),(null==b?void 0:b.explicitDisclaimer)&&(0,d.jsx)(t8.N,{containerClassName:t6().explicitMarkContainer,getDescriptionTexts:b.getDescriptionTexts,size:\"xxxs\",variant:b.explicitDisclaimer,className:t6().explicitMark,trackId:b.id}),!s.isGenerativeContext&&(0,d.jsx)(\"span\",{className:t6().timecodeOverlay,\"aria-hidden\":!0,\"data-test-id\":g.e8.player.VIBE_PLAYERBAR_TIMECODE,children:scrub?scrub.text:\"\".concat(I,\" / \").concat(E)}),!s.isGenerativeContext&&(0,d.jsx)(tJ.A,{className:(0,c.$)(t6().slider,{[t6().slider_active]:!s.isGenerativeContext}),\"aria-label\":u({id:\"player-actions.timecode-control\"}),\"aria-valuetext\":scrub?scrub.text:\"\".concat(O,\" / \").concat(B),disabled:!b||o.isAdvertShown||!!scrub,style:{pointerEvents:\"none\"},onChange:L,onFocus:P,onBlur:T,maxValue:Math.round(x),mode:\"deferred\",value:Math.round(scrub?scrub.sec:S),showThumbVariant:\"never\",trackSize:\"s\",thumbSize:\"s\"}),scrub&&(0,d.jsx)(\"div\",{style:{position:\"absolute\",bottom:\"calc(100% + 12px)\",left:\"\".concat(scrub.tooltipX,\"px\"),transform:\"translateX(-50%)\",backgroundColor:\"rgba(22, 22, 26, 0.88)\",backdropFilter:\"blur(16px)\",WebkitBackdropFilter:\"blur(16px)\",color:\"#ffffff\",padding:\"4px 12px\",borderRadius:\"9999px\",fontSize:\"12px\",fontWeight:\"600\",fontVariantNumeric:\"tabular-nums\",pointerEvents:\"none\",zIndex:9999,boxShadow:\"0 4px 20px rgba(0, 0, 0, 0.4)\",whiteSpace:\"nowrap\",letterSpacing:\"0.2px\",lineHeight:\"1.4\"},children:scrub.text})]})})})'''
+            content = content[:s_pos] + new_t9 + content[e_pos:]
+
+            # Unrestrict reset button & settings
+            t_target = '$=l.checkExperiment(z.z.WebNextDisableVibeSettings,"on")||b.isVibeStartRestricted||!u.isAuthorized'
+            t_repl = '$=l.checkExperiment(z.z.WebNextDisableVibeSettings,"on")'
+            if t_target in content:
+                content = content.replace(t_target, t_repl, 1)
+
+            with open(fpath, "w", encoding="utf-8") as f:
+                f.write(content)
+            print("Successfully patched modern VibePlayerBar!")
+            break
+
+def patch_wheel_fallback(inspect_dir):
+    chunks_dir = os.path.join(inspect_dir, "app/_next/static/chunks")
+    for fpath in glob.glob(os.path.join(chunks_dir, "*.js")):
+        with open(fpath, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        if "vibe-wheel.activity-wake-up" in content and "wheelNew" in content:
+            print(f"Found modern Wheel Store in {os.path.basename(fpath)}")
+            modified = False
+
+            # 1. Resolve loadingState on pumpkin fallback
+            target = 'else d.error("[Wheel] Load error",{error:t});e.loadingState=x.G.REJECT}})}})'
+            new_code = 'else d.error("[Wheel] Load error",{error:t});e.loadingState=e.items.length>0?x.G.RESOLVE:x.G.REJECT}})}})'
+            if target in content:
+                content = content.replace(target, new_code)
+                modified = True
+
+            target_cond = 'catch(t){if(e.isEmpty&&a){'
+            new_cond = 'catch(t){let fb=typeof a==="function"?a:(x=>x.id);if(e.isEmpty||0===e.items.length){'
+            if target_cond in content:
+                content = content.replace(target_cond, new_cond)
+                modified = True
+
+            target_call = '})(a);e.wheelId=i.wheelId'
+            new_call = '})(fb);e.wheelId=i.wheelId'
+            if target_call in content:
+                content = content.replace(target_call, new_call)
+                modified = True
+
+            if modified:
+                with open(fpath, "w", encoding="utf-8") as f:
+                    f.write(content)
+                print("Successfully patched modern Wheel fallback logic!")
+            break
 
 def patch_css(inspect_dir):
-    path = os.path.join(inspect_dir, "app/_next/static/css/9efcd640c6a02026.css")
-    if not os.path.exists(path):
-        print(f"Warning: {path} not found")
-        return
-    with open(path, "r", encoding="utf-8") as f:
-        css = f.read()
-    rule = '''
-.VibePlayerBar_center__yug8i {
+    css_dir = os.path.join(inspect_dir, "app/_next/static/css")
+    for fpath in glob.glob(os.path.join(css_dir, "*.css")):
+        with open(fpath, "r", encoding="utf-8") as f:
+            css = f.read()
+
+        if "VibePlayerbarMeta_center" in css:
+            rule = '''
+.VibePlayerbarMeta_center__6kbMi {
     user-select: none !important;
     -webkit-user-select: none !important;
 }
-.VibePlayerBar_center__yug8i.VibePlayerBar_scrubbing:before {
+.VibePlayerbarMeta_center__6kbMi.VibePlayerbarMeta_scrubbing:before {
     transition: none !important;
 }
 '''
-    if '.VibePlayerBar_scrubbing' not in css:
-        css += rule
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(css)
-        print("Successfully patched 9efcd640c6a02026.css!")
-    else:
-        print("CSS already patched!")
-
-def patch_6602(inspect_dir):
-    path = os.path.join(inspect_dir, "app/_next/static/chunks/6602.3894c4c5abbbd85d.js")
-    with open(path, "r", encoding="utf-8") as f:
-        content = f.read()
-    
-    # 1. Desktop render fallback so it never collapses to empty
-    target_render = "return l&&r?(0,a.jsx)(H,{className:t}):(0,a.jsx)(v.RC,"
-    new_render = "return(l||r||0===i.length)?(0,a.jsx)(H,{className:t}):(0,a.jsx)(v.RC,"
-    if target_render in content:
-        content = content.replace(target_render, new_render)
-    
-    # 2. In entity change listener b: restore genuine seeds (remove genre:all hack)
-    hack_case_vibe = 'case _.K.Vibe:{let sd=String(d).split(",");if(sd.length===1&&sd[0]==="user:onyourwave")sd=["user:onyourwave","genre:all"];return{type:h.b.WAVE,data:{seeds:sd}}};'
-    clean_case_vibe = 'case _.K.Vibe:return{type:h.b.WAVE,data:{seeds:String(d).split(",")}};'
-    if hack_case_vibe in content:
-        content = content.replace(hack_case_vibe, clean_case_vibe)
-    
-    # 3. Clean any illegal hook calls in G
-    bad_effects = [
-        ';(0,s.useEffect)(()=>{if(0===i.length){(0,c.Pjs)().wheel.getData({context:{type:h.b.WAVE,data:{seeds:["user:onyourwave"]}}},_)}},[i.length]);',
-        '(0,s.useEffect)(()=>{if(0===i.length){(0,c.Pjs)().wheel.getData({context:{type:h.b.WAVE,data:{seeds:["user:onyourwave"]}}},_)}},[i.length]);',
-        ';(0,s.useEffect)(()=>{if(0===i.length){(0,c.Pjs)().wheel.getData({context:{type:h.b.WAVE,data:{seeds:["user:onyourwave","genre:all"]}}},_)}},[i.length]);',
-        '(0,s.useEffect)(()=>{if(0===i.length){(0,c.Pjs)().wheel.getData({context:{type:h.b.WAVE,data:{seeds:["user:onyourwave","genre:all"]}}},_)}},[i.length]);'
-    ]
-    for b in bad_effects:
-        content = content.replace(b, "")
-    
-    # Ensure semicolon after slideToLoop effect closing parenthesis before let j
-    content = content.replace("},[o,i.length])let j=", "},[o,i.length]);let j=")
-    content = content.replace("},[o,i.length]),let j=", "},[o,i.length]);let j=")
-    
-    # 4. In he: add safe on-mount check to trigger wheel fetch if empty
-    target_he_effect = '(0,s.useEffect)(()=>{let e=p?.state.queueState.currentEntity.onChange(b);return()=>{null==e||e()}},[p,b,i])'
-    new_he_effect = '(0,s.useEffect)(()=>{if(i.isEmpty){let cur=p?.state?.queueState?.currentEntity?.value;cur?b(cur):i.getData({context:{type:h.b.WAVE,data:{seeds:["user:onyourwave"]}}})}let e=p?.state.queueState.currentEntity.onChange(b);return()=>{null==e||e()}},[p,b,i])'
-    if target_he_effect in content:
-        content = content.replace(target_he_effect, new_he_effect)
-    
-    # 5. getData call condition in b: allow getData if isEmpty
-    target_call = "(i.entityMeta?.isTrackMusic||!t.lastRequestId)&&t.getData({context:l},e)"
-    new_call = "(i.entityMeta?.isTrackMusic||!t.lastRequestId||t.isEmpty)&&t.getData({context:l},e)"
-    if target_call in content:
-        content = content.replace(target_call, new_call)
-        
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
-    print("Successfully patched 6602!")
+            if '.VibePlayerbarMeta_scrubbing' not in css:
+                css += rule
+                with open(fpath, "w", encoding="utf-8") as f:
+                    f.write(css)
+                print(f"Successfully patched CSS in {os.path.basename(fpath)}!")
+            else:
+                print(f"CSS in {os.path.basename(fpath)} already patched.")
+            break
 
 def patch_modern_chunks(inspect_dir):
     chunks_dir = os.path.join(inspect_dir, "app/_next/static/chunks")
-    if not os.path.isdir(chunks_dir):
-        return
     for fname in os.listdir(chunks_dir):
         if not fname.endswith(".js"):
             continue
@@ -148,61 +99,45 @@ def patch_modern_chunks(inspect_dir):
             content = f.read()
         modified = False
 
-        # 1. Reset button logic fix for modern build:
-        target_reset = "$=(()=>{let e=(0,ts.e)(),t=null==e?void 0:e.state.currentContext.value;if((null==t?void 0:t.data.type)===iP.K.Vibe){var i,a;let e=null==(i=t.data.meta.session)?void 0:i.wave;if((null==e?void 0:e.seeds.length)===1&&(null==e?void 0:e.seeds[0])===eu.M1||(null==e?void 0:e.seeds.length)===1&&(null==e||null==(a=e.seeds[0])?void 0:a.includes(eu.yx)))return!1}return!0})()"
-        new_reset = "$=(()=>{try{let e=(0,ts.e)(),t=e?.state.currentContext.value;if(!t||t?.data?.type!==iP.K.Vibe)return!1;let w=t?.data?.meta?.session?.wave;if(!w||!w.seeds||0===w.seeds.length)return!1;if(w.seeds.includes(eu.M1)||w.seeds[0]===eu.M1||w.seeds.some(e=>e&&e.includes(eu.yx)))return!1;return!0}catch(e){return!1}})()"
-        if target_reset in content:
-            content = content.replace(target_reset, new_reset)
-            modified = True
-            print(f"Patched reset button logic in modern chunk: {fname}")
-
-        # 2. Wheel fallback render in modern build:
+        # Wheel Desktop fallback render
         target_render = "return l&&r?(0,i.jsx)(eS,{className:t}):(0,i.jsx)(L.RC,"
         new_render = "return(l||r||0===a.length)?(0,i.jsx)(eS,{className:t}):(0,i.jsx)(L.RC,"
         if target_render in content:
             content = content.replace(target_render, new_render)
             modified = True
-            print(f"Patched wheel fallback in modern chunk: {fname}")
+            print(f"Patched wheel desktop render in {fname}")
 
-        # 3. Plus unlock: User.hasPlus -> true
+        # Plus unlock: User.hasPlus -> true
         target_has_plus = "get hasPlus(){return!!e.account.data.hasPlus}"
         new_has_plus = "get hasPlus(){return!0}"
         if target_has_plus in content:
             content = content.replace(target_has_plus, new_has_plus)
             modified = True
-            print(f"Patched User.hasPlus in modern chunk: {fname}")
+            print(f"Patched User.hasPlus in {fname}")
 
-        # 4. Plus unlock: FreeAccess -> all false
+        # Plus unlock: FreeAccess -> false
         target_free_access = 'FreeAccess").views(e=>{let t={get isFreeDesktopUser(){let{user:t}=(0,P.M)(e);return!t.hasPlus&&T.NN},get isFreeWebUser(){let{user:t}=(0,P.M)(e);return!t.hasPlus&&T.$3},get isFreeUser(){return t.isFreeDesktopUser||t.isFreeWebUser},get isFreePlaybackDisabled(){'
         new_free_access = 'FreeAccess").views(e=>{let t={get isFreeDesktopUser(){return!1},get isFreeWebUser(){return!1},get isFreeUser(){return!1},get isFreePlaybackDisabled(){return!1;'
         if target_free_access in content:
             content = content.replace(target_free_access, new_free_access)
             modified = True
-            print(f"Patched FreeAccess in modern chunk: {fname}")
+            print(f"Patched FreeAccess in {fname}")
 
-        # 5. Plus unlock: e.account.data hasPlus -> true
+        # Plus unlock: e.account.data hasPlus -> true
         target_acct_plus = "hasPlus:e.hasPlus,publicId:e.publicId"
         new_acct_plus = "hasPlus:!0,publicId:e.publicId"
         if target_acct_plus in content:
             content = content.replace(target_acct_plus, new_acct_plus)
             modified = True
-            print(f"Patched e.account.data.hasPlus in modern chunk: {fname}")
+            print(f"Patched e.account.data.hasPlus in {fname}")
 
-        # 6. Plus unlock: Bypass PREVIEW quality fallback in layout
+        # Plus unlock: Bypass PREVIEW quality fallback
         target_preview = "if(!h.isAuthorized||f.isFreeDesktopUser||H||f.limitedFreePlayback)return tV.e.PREVIEW;"
         new_preview = "if(!1)return tV.e.PREVIEW;"
         if target_preview in content:
             content = content.replace(target_preview, new_preview)
             modified = True
-            print(f"Patched PREVIEW quality check in modern chunk: {fname}")
-
-        # 7. Plus unlock: Remove 29s customDuration
-        target_duration = "customDuration:(null==n?void 0:n.isAuthorized)&&!o.isFreeDesktopUser?void 0:29"
-        new_duration = "customDuration:void 0"
-        if target_duration in content:
-            content = content.replace(target_duration, new_duration)
-            modified = True
-            print(f"Patched customDuration in modern chunk: {fname}")
+            print(f"Patched PREVIEW quality check in {fname}")
 
         if modified:
             with open(fpath, "w", encoding="utf-8") as f:
@@ -211,17 +146,14 @@ def patch_modern_chunks(inspect_dir):
 if __name__ == "__main__":
     inspect_dir = sys.argv[1] if len(sys.argv) > 1 else "inspect_asar"
     if not os.path.isdir(inspect_dir):
-        # Check parent directory
         if os.path.isdir(os.path.join("..", inspect_dir)):
             inspect_dir = os.path.join("..", inspect_dir)
         else:
             print(f"ERROR: {inspect_dir} not found!")
             sys.exit(1)
-    print(f"Applying wheel patch to: {inspect_dir}")
-    if os.path.exists(os.path.join(inspect_dir, "app/_next/static/chunks/7511-470ddb0b1430b7fa.js")):
-        patch_7511(inspect_dir)
-    if os.path.exists(os.path.join(inspect_dir, "app/_next/static/chunks/6602.3894c4c5abbbd85d.js")):
-        patch_6602(inspect_dir)
+    print(f"Applying patches to: {inspect_dir}")
+    patch_vibe_playerbar(inspect_dir)
+    patch_wheel_fallback(inspect_dir)
     patch_modern_chunks(inspect_dir)
     patch_css(inspect_dir)
     print("All patches applied successfully!")
