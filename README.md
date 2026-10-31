@@ -80,21 +80,48 @@ MimeType=x-scheme-handler/yandexmusic;
 
 ## 🛠️ Сборка из исходников
 
-Для сборки требуются: `node`, `bun`, `mksquashfs`, `asar`.
+Для сборки требуются утилиты: `node` (>=18), `bun`, `python3`, `mksquashfs` (`squashfs-tools`), `asar` (`bunx asar`).
 
-1. Клонируйте репозиторий:
-   ```bash
-   git clone https://github.com/Mrklapl/Yandex-Music-Mod-Linux.git
-   cd Yandex-Music-Mod-Linux
-   ```
-2. Примените патчи интерфейса и колеса интересов:
-   ```bash
-   python3 scripts/apply-wheel-patch.py
-   ```
-3. Соберите AppImage:
-   ```bash
-   bash scripts/build-appimage.sh
-   ```
+### 1. Подготовка репозитория
+```bash
+git clone https://github.com/Mrklapl/Yandex-Music-Mod-Linux.git
+cd Yandex-Music-Mod-Linux
+```
+
+### 2. Подготовка исходных файлов (выберите один из вариантов)
+
+#### Вариант А: Использование готового AppImage (быстро)
+Если у вас уже скачан любой предыдущий релиз AppImage:
+```bash
+# Распаковываем app.asar из существующего AppImage
+./YandexMusicMod-5.123.4-2.23.2.linux.AppImage --appimage-extract
+bunx asar extract squashfs-root/resources/app.asar inspect_asar
+rm -rf squashfs-root
+```
+
+#### Вариант Б: Сборка с нуля из официального .deb пакета Яндекс Музыки
+```bash
+# 1. Скачиваем официальный пакет Яндекса
+curl -LO https://music-desktop-application.s3.yandex.net/stable/Yandex_Music_amd64_5.125.3.deb
+
+# 2. Распаковываем ресурсы
+ar x Yandex_Music_amd64_5.125.3.deb data.tar.xz
+tar -xf data.tar.xz
+
+# 3. Извлекаем app.asar в директорию inspect_asar
+bunx asar extract "opt/Яндекс Музыка/resources/app.asar" inspect_asar
+rm -rf data.tar.xz control.tar.gz debian-binary usr opt
+```
+
+### 3. Применение патчей и сборка AppImage
+```bash
+# Применяем патчи перемотки капсулы, колеса интересов и обхода ограничений
+python3 scripts/apply-wheel-patch.py inspect_asar
+
+# Собираем итоговый AppImage (передав путь к базовому AppImage при необходимости)
+bash scripts/build-appimage.sh
+```
+Готовый исполняемый файл `YandexMusicMod-<версия>.linux.AppImage` появится в корне репозитория.
 
 ---
 
