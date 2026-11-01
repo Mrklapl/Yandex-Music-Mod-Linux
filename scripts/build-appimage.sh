@@ -37,6 +37,10 @@ if [ -z "${BASE_APPIMAGE}" ]; then
     BASE_APPIMAGE=$(ls -t "${WORKDIR}"/YandexMusicMod-*.AppImage "${WORKDIR}"/../*.AppImage 2>/dev/null | head -n 1 || true)
 fi
 
+if [ -n "${BASE_APPIMAGE}" ] && [ -f "${BASE_APPIMAGE}" ]; then
+    BASE_APPIMAGE="$(readlink -f "${BASE_APPIMAGE}")"
+fi
+
 if [ -z "${BASE_APPIMAGE}" ] || [ ! -f "${BASE_APPIMAGE}" ]; then
     echo "ERROR: Base AppImage not found. Please provide path to existing AppImage as argument: $0 <path-to-appimage>"
     exit 1
